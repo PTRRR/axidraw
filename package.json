@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ebb-tools": "^1.0.8",
+    "ebb-tools": "^1.1.0",
+    "fontkit": "^1.8.1",
     "koa": "^2.13.0",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^10.0.0",
