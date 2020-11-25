@@ -8,7 +8,8 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const print = document.querySelector('h1');
+const printButton = document.querySelector('.print');
+const deleteButton = document.querySelector('.delete');
 
 let paths = [];
 let fullPath = [];
@@ -48,7 +49,7 @@ canvas.addEventListener('touchstart', handleMouseDown);
 canvas.addEventListener('touchmove', handleMouseMove);
 canvas.addEventListener('touchend', handleMouseUp);
 
-print.addEventListener('click', () => {
+printButton.addEventListener('click', () => {
   fetch(`${window.location.origin}/`, {
     method: 'POST',
     headers: {
@@ -56,6 +57,12 @@ print.addEventListener('click', () => {
     },
     body: JSON.stringify(scaledPath),
   });
+});
+
+deleteButton.addEventListener('click', () => {
+  paths = [];
+  currentPath = null;
+  scaledPath = render(paths);
 });
 
 function render (paths) {
@@ -66,7 +73,6 @@ function render (paths) {
   ctx.fillRect(0, 0, width, height);
 
   for (const path of paths) {
-    console.log(path);
     if (path.length > 0) {
       let started = false;
 
