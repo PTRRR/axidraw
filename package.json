@@ -4,17 +4,25 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon examples/server.js"
+    "dev": "nodemon examples/server.js & parcel public/index.html --out-dir public/dist --public-url ./client/",
+    "start": "parcel build public/index.html --out-dir public/dist --public-url ./client/ && node examples/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "curve-interpolator": "^2.0.8",
     "ebb-tools": "^1.1.0",
     "fontkit": "^1.8.1",
     "koa": "^2.13.0",
     "koa-bodyparser": "^4.3.0",
+    "koa-logger": "^3.2.1",
+    "koa-mount": "^4.0.0",
     "koa-router": "^10.0.0",
-    "nodemon": "^2.0.6"
+    "koa-static": "^5.0.0",
+    "nodemon": "^2.0.6",
+    "parcel-bundler": "^1.12.4",
+    "simplex-noise": "^2.4.0",
+    "simplify-path": "^1.1.0"
   }
 }

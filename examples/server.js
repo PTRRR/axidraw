@@ -1,6 +1,9 @@
 const Koa = require('koa');
 const Router = require('koa-router');
 const bodyparser = require('koa-bodyparser');
+const serve = require('koa-static');
+const mount = require('koa-mount');
+const logger = require('koa-logger');
 const getAxidraw = require('../axidraw');
 const { getPaths } = require('../utils/font');
 
@@ -11,32 +14,35 @@ const init = async () => {
 
   const app = new Koa();
   const router = new Router();
+  let busy = false;
 
   router.post('/', async (ctx, next) => {
+    if (busy) return;
+    busy = true;
     const path = ctx.request.body;
 
     if (path && Array.isArray(path)) {
-      await axidraw.raiseBrush();
-
       for (const point of path) {
-        const index = path.indexOf(point);
-        const [x, y] = point;
-
-        if (index === 1) await axidraw.lowerBrush();
+        const [x, y, z] = point;
+        if (z === 0) await axidraw.raiseBrush();
+        if (z === 1) await axidraw.lowerBrush();
         await axidraw.moveTo(x, y);
       }
 
       await axidraw.raiseBrush();
-      await axidraw.moveTo(0, 0);
       await axidraw.waitForEmptyQueue();
       await axidraw.disableStepperMotors();
     }
 
+    busy = false;
     ctx.response.status = 200;
     await next();
   });
 
   router.get('/write', async (ctx, next) => {
+    if (busy) return;
+    busy = true;
+
     const { query } = ctx.request;
     const { word } = query;
     const scale = 5;
@@ -74,13 +80,16 @@ const init = async () => {
     await axidraw.waitForEmptyQueue();
     await axidraw.disableStepperMotors();
 
+    busy = false;
     ctx.response.status = 200;
     await next();
   });
 
+  app.use(mount('/client', serve('./public/dist')));
   app.use(bodyparser());
-  app.use(router.routes());
+  app.use(logger());
   app.use(router.allowedMethods());
+  app.use(router.routes());
 
   app.listen(PORT, () => {
     console.log(`Axidraw is litening on port ${PORT}`);
